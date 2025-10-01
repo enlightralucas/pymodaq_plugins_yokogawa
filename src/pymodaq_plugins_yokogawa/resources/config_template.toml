@@ -1,0 +1,28 @@
+title = 'Configuration file for PyMoDAQ Yokogawa plugin'
+
+[AQ6370]
+# Default settings for Yokogawa AQ6370 series Optical Spectrum Analyzers
+
+# Instrument model selection
+# Options: AQ6370C, AQ6370D, AQ6370E, AQ6373, AQ6373B, AQ6375, AQ6375B
+model = "AQ6370D"
+
+# VISA connection address
+# Examples:
+#   GPIB: "GPIB0::1::INSTR"
+#   USB: "USB0::0x0B21::0x0039::INSTR"
+#   Ethernet: "TCPIP::192.168.1.100::10001::SOCKET"
+visa_address = "TCPIP::192.168.1.100::10001::SOCKET"
+
+# Sweep settings
+[AQ6370.sweep_settings]
+center_wl = 1550.0      # Center wavelength in nm
+span_wl = 100.0         # Span in nm
+resolution = 0.1        # Resolution bandwidth in nm (0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0)
+sensitivity = "NORM"    # Sensitivity mode (NHLD, NAUT, NORM, MID, HIGH1, HIGH2, HIGH3)
+sample_points = 1001    # Number of sample points (101 to 50001)
+
+# Trace settings
+[AQ6370.trace]
+active_trace = "TRA"    # Active trace (TRA, TRB, TRC, TRD, TRE, TRF, TRG)
+auto_sweep = true       # Automatically trigger sweep on grab

@@ -1,44 +1,24 @@
-pymodaq_plugins_template
-########################
+pymodaq_plugins_yokogawa
+#########################
 
-.. the following must be adapted to your developed package, links to pypi, github  description...
+PyMoDAQ plugin for Yokogawa instruments
 
-.. image:: https://img.shields.io/pypi/v/pymodaq_plugins_template.svg
-   :target: https://pypi.org/project/pymodaq_plugins_template/
+.. image:: https://img.shields.io/pypi/v/pymodaq_plugins_yokogawa.svg
+   :target: https://pypi.org/project/pymodaq_plugins_yokogawa/
    :alt: Latest Version
 
 .. image:: https://readthedocs.org/projects/pymodaq/badge/?version=latest
    :target: https://pymodaq.readthedocs.io/en/stable/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://github.com/PyMoDAQ/pymodaq_plugins_template/workflows/Upload%20Python%20Package/badge.svg
-   :target: https://github.com/PyMoDAQ/pymodaq_plugins_template
-   :alt: Publication Status
 
-.. image:: https://github.com/PyMoDAQ/pymodaq_plugins_template/actions/workflows/Test.yml/badge.svg
-    :target: https://github.com/PyMoDAQ/pymodaq_plugins_template/actions/workflows/Test.yml
-
-
-Use this template to create a repository on your account and start the development of your own PyMoDAQ plugin!
+This plugin provides PyMoDAQ interfaces for Yokogawa instruments using the PyMeasure library.
 
 
 Authors
 =======
 
-* First Author  (myemail@xxx.org)
-* Other author (myotheremail@xxx.org)
-
-.. if needed use this field
-
-    Contributors
-    ============
-
-    * First Contributor
-    * Other Contributors
-
-.. if needed use this field
-
-  Depending on the plugin type, delete/complete the fields below
+* Lucas Braud (lucas.braud@enlightra.com)
 
 
 Instruments
@@ -46,43 +26,42 @@ Instruments
 
 Below is the list of instruments included in this plugin
 
-Actuators
-+++++++++
-
-* **yyy**: control of yyy actuators
-* **xxx**: control of xxx actuators
-
-Viewer0D
-++++++++
-
-* **yyy**: control of yyy 0D detector
-* **xxx**: control of xxx 0D detector
-
 Viewer1D
 ++++++++
 
-* **yyy**: control of yyy 1D detector
-* **xxx**: control of xxx 1D detector
+* **AQ6370 Series**: Yokogawa AQ6370 series Optical Spectrum Analyzers (OSA)
 
-
-Viewer2D
-++++++++
-
-* **yyy**: control of yyy 2D detector
-* **xxx**: control of xxx 2D detector
-
-
-PID Models
-==========
-
-
-Extensions
-==========
+  - Supported models: AQ6370C, AQ6370D, AQ6370E, AQ6373, AQ6373B, AQ6375, AQ6375B
+  - Communication: VISA (GPIB, USB, Ethernet)
+  - 1D viewer for spectral data (wavelength vs power)
 
 
 Installation instructions
 =========================
 
-* PyMoDAQ’s version.
-* Operating system’s version.
-* What manufacturer’s drivers should be installed to make this plugin run?
+**Requirements:**
+
+* PyMoDAQ >= 5.0.0
+* PyMeasure >= 0.11.0
+* PyVISA >= 1.11.0
+* Operating system: Windows, Linux, macOS
+* NI-VISA or PyVISA-py backend for instrument communication
+
+**Installation:**
+
+.. code-block:: bash
+
+   pip install pymodaq_plugins_yokogawa
+
+**VISA Backend:**
+
+You need a VISA backend to communicate with the instruments:
+
+* NI-VISA (recommended): Download from National Instruments website
+* PyVISA-py (pure Python alternative): ``pip install pyvisa-py``
+
+**Instrument Connection:**
+
+* **GPIB**: Requires GPIB interface hardware
+* **USB**: Direct USB connection
+* **Ethernet**: TCP/IP connection (default port: 10001)
