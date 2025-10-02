@@ -68,6 +68,7 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
          'tip': 'Automatically trigger sweep on grab'},
         {'title': 'Power Threshold (dBm):', 'name': 'power_threshold', 'type': 'float',
          'value': -65.0, 'suffix': ' dBm', 'tip': 'Set values below threshold to threshold (noise floor)'},
+        {'title': 'ID:', 'name': 'instrument_id', 'type': 'str', 'value': '', 'readonly': True},
     ]
 
     # Resolution mapping: display value (nm) -> pymeasure value (m)
@@ -180,6 +181,7 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
 
                 # Get identity
                 info = self.controller.id
+                self.settings.child('instrument_id').setValue(info)
                 initialized = True
 
             except Exception as e:
