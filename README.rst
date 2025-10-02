@@ -42,7 +42,7 @@ Installation instructions
 **Requirements:**
 
 * PyMoDAQ >= 5.0.0
-* PyMeasure >= 0.11.0
+* PyMeasure (development version) - requires latest features from master branch
 * PyVISA >= 1.11.0
 * Operating system: Windows, Linux, macOS
 * NI-VISA or PyVISA-py backend for instrument communication
@@ -51,6 +51,12 @@ Installation instructions
 
 .. code-block:: bash
 
+   # Install PyMeasure from source (development mode)
+   git clone https://github.com/pymeasure/pymeasure.git
+   cd pymeasure
+   pip install -e .
+
+   # Install the plugin
    pip install pymodaq_plugins_yokogawa
 
 **VISA Backend:**

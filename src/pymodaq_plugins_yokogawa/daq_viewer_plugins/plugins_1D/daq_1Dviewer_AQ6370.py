@@ -62,11 +62,24 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
              'value': 5001, 'min': 101, 'max': 50001},
         ]},
         {'title': 'Active Trace:', 'name': 'active_trace', 'type': 'list',
-         'limits': ['TRA', 'TRB', 'TRC', 'TRD', 'TRE', 'TRF', 'TRG'],
-         'value': 'TRA'},
+         'limits': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+         'value': 'A'},
         {'title': 'Auto Sweep:', 'name': 'auto_sweep', 'type': 'bool', 'value': True,
          'tip': 'Automatically trigger sweep on grab'},
+        {'title': 'Power Threshold (dBm):', 'name': 'power_threshold', 'type': 'float',
+         'value': -65.0, 'suffix': ' dBm', 'tip': 'Set values below threshold to threshold (noise floor)'},
     ]
+
+    # Resolution mapping: display value (nm) -> pymeasure value (m)
+    RESOLUTION_MAP = {
+        0.02: 0.02e-9,
+        0.05: 0.05e-9,
+        0.1: 0.1e-9,
+        0.2: 0.2e-9,
+        0.5: 0.5e-9,
+        1.0: 1e-9,
+        2.0: 2e-9,
+    }
 
     def ini_attributes(self):
         """Initialize attributes"""
@@ -90,13 +103,15 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
             elif param.name() == 'span_wl':
                 self.controller.wavelength_span = param.value() * 1e-9
             elif param.name() == 'resolution':
-                self.controller.resolution_bandwidth = param.value() * 1e-9
+                self.controller.resolution_bandwidth = self.RESOLUTION_MAP[param.value()]
             elif param.name() == 'sensitivity':
                 self.controller.sensitivity = param.value()
             elif param.name() == 'sample_points':
                 self.controller.sample_number = int(param.value())
             elif param.name() == 'active_trace':
-                self.controller.active_trace = param.value()
+                # Convert trace letter to index (A=0, B=1, etc.)
+                trace_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6}
+                self.controller.active_trace = trace_map[param.value()]
         except Exception as e:
             self.emit_status(ThreadCommand('Update_Status', [f'Error setting parameter: {str(e)}', 'log']))
 
@@ -150,13 +165,18 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
                     except Exception:
                         pass  # Authentication may not be required for all devices
 
+                # Set transfer format to ASCII to avoid binary decoding issues
+                self.controller.transfer_format = "ASCII"
+
                 # Apply initial settings
                 self.controller.wavelength_center = self.settings['sweep_settings', 'center_wl'] * 1e-9
                 self.controller.wavelength_span = self.settings['sweep_settings', 'span_wl'] * 1e-9
-                self.controller.resolution_bandwidth = self.settings['sweep_settings', 'resolution'] * 1e-9
+                self.controller.resolution_bandwidth = self.RESOLUTION_MAP[self.settings['sweep_settings', 'resolution']]
                 self.controller.sensitivity = self.settings['sweep_settings', 'sensitivity']
                 self.controller.sample_number = self.settings['sweep_settings', 'sample_points']
-                self.controller.active_trace = self.settings['active_trace']
+                # Convert trace letter to index (A=0, B=1, etc.)
+                trace_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6}
+                self.controller.active_trace = trace_map[self.settings['active_trace']]
 
                 # Get identity
                 info = self.controller.id
@@ -178,7 +198,7 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
         stop_wl = self.settings['sweep_settings', 'center_wl'] + self.settings['sweep_settings', 'span_wl'] / 2
         n_points = self.settings['sweep_settings', 'sample_points']
         wavelengths = np.linspace(start_wl, stop_wl, n_points)
-        self.x_axis = Axis(data=wavelengths, label='Wavelength', units='nm', index=0)
+        self.x_axis = Axis(data=wavelengths, label='Wavelength (nm)', units='', index=0)
 
         # Initialize data structure
         self.dte_signal_temp.emit(DataToExport(name='AQ6370',
@@ -225,8 +245,12 @@ class DAQ_1DViewer_AQ6370(DAQ_Viewer_base):
             wavelengths_nm = np.array(wavelengths) * 1e9
             powers_dbm = np.array(powers)
 
+            # Apply power threshold to filter noise
+            threshold = self.settings['power_threshold']
+            powers_dbm = np.where(powers_dbm < threshold, threshold, powers_dbm)
+
             # Update x-axis with actual data
-            self.x_axis = Axis(data=wavelengths_nm, label='Wavelength', units='nm', index=0)
+            self.x_axis = Axis(data=wavelengths_nm, label='Wavelength (nm)', units='', index=0)
 
             # Emit data
             self.dte_signal.emit(DataToExport('AQ6370',
